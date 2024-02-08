@@ -14,10 +14,10 @@ public class LoginTest {
     public static final String URL_LOGIN = "http://localhost:8080/leiloes/login";
     private WebDriver browser;
 
-    //@BeforeAll
-    //public static void beforeAll() {
+    @BeforeAll
+    public static void beforeAll() {
         // Caso não esteja global - System.setProperty("webdriver.chrome.driver", "/drivers/chromedriver.exe");
-    //}
+    }
 
     @BeforeEach
     public void beforeEach() {
@@ -49,5 +49,14 @@ public class LoginTest {
         Assert.assertTrue(browser.getCurrentUrl().equals("http://localhost:8080/login?error"));
         Assert.assertTrue(browser.getPageSource().contains("Usuário e senha inválidos."));
         Assert.assertThrows(NoSuchElementException.class, ()->browser.findElement(By.id("usuario-logado")));
+    }
+
+    @Test
+    public void naoDeveriaAcessarPaginaRestritaSemEstarLogado() {
+        this.browser.navigate().to("http://localhost:8080/leiloes/2");
+
+        Assert.assertTrue(browser.getCurrentUrl().equals("http://localhost:8080/login"));
+        Assert.assertFalse(browser.getPageSource().contains("Dados do Leilão"));
+
     }
 }
