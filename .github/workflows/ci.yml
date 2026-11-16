@@ -1,0 +1,68 @@
+name: Selenium Java Acceptance CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  selenium-acceptance-tests:
+    name: Spring Boot & Selenium Acceptance Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 11 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: "11"
+          distribution: "temurin"
+          cache: "maven"
+
+      - name: Setup Chrome and ChromeDriver
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          install-chromedriver: "true"
+
+      - name: Compile application and test sources
+        run: mvn -B test-compile
+
+      - name: Start Spring Boot Leilão application (port 8080)
+        run: |
+          mvn -B spring-boot:run > /tmp/leilao.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl -sf http://localhost:8080/login >/dev/null; then
+              echo "Leilao application is ready."
+              break
+            fi
+            if [ "$i" -eq 45 ]; then
+              cat /tmp/leilao.log
+              exit 1
+            fi
+            sleep 1
+          done
+
+      - name: Execute Selenium & JUnit acceptance suite (headless)
+        run: |
+          mvn -B test \
+            -Dheadless=true \
+            -Dwebdriver.chrome.driver="${{ steps.setup-chrome.outputs.chromedriver-path }}"
+
+      - name: Dump application logs on failure
+        if: failure()
+        run: cat /tmp/leilao.log || true
+
+      - name: Upload Maven Surefire test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          if-no-files-found: ignore
+          retention-days: 14
