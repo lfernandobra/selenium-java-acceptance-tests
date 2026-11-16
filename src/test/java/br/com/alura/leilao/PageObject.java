@@ -3,6 +3,8 @@ package br.com.alura.leilao;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +30,14 @@ public class PageObject {
         this.browser.manage().timeouts()
                 .implicitlyWait(5, TimeUnit.SECONDS)
                 .pageLoadTimeout(10, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Aguarda a navegacao sair da URL informada apos um submit/redirecionamento.
+     */
+    protected void aguardarSaidaDaUrl(String urlAnterior) {
+        new WebDriverWait(this.browser, 5)
+                .until(ExpectedConditions.not(ExpectedConditions.urlToBe(urlAnterior)));
     }
 
     public void fechar() {

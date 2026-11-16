@@ -15,7 +15,8 @@ public class CadastroLeilaoPage extends PageObject {
         this.browser.findElement(By.id("nome")).sendKeys(nome);
         this.browser.findElement(By.id("valorInicial")).sendKeys(valorInicial);
         this.browser.findElement(By.id("dataAbertura")).sendKeys(dataAbertura);
-        this.browser.findElement(By.id("button-submit")).click();
+        this.browser.findElement(By.id("button-submit")).submit();
+        aguardarSaidaDaUrl(URL_CADASTRO_LEILAO);
 
         return new LeiloesPage(browser);
     }

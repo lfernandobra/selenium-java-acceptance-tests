@@ -22,6 +22,7 @@ public class LoginPage extends PageObject {
 
     public LeiloesPage efetuaLogin() {
         browser.findElement(By.id("login-form")).submit();
+        aguardarSaidaDaUrl(URL_LOGIN);
         return new LeiloesPage(browser);
     }
 
