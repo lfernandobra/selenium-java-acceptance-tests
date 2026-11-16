@@ -1,5 +1,6 @@
 package br.com.alura.leilao;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -49,10 +50,13 @@ public class PageObject {
     }
 
     /**
-     * Aguarda a navegacao sair da URL informada apos um submit/redirecionamento.
+     * Aguarda a navegacao sair da URL informada e concluir o carregamento do novo documento.
      */
     protected void aguardarSaidaDaUrl(String urlAnterior) {
-        esperaPadrao().until(ExpectedConditions.not(ExpectedConditions.urlToBe(urlAnterior)));
+        WebDriverWait wait = esperaPadrao();
+        wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(urlAnterior)));
+        wait.until(driver -> "complete".equals(
+                ((JavascriptExecutor) driver).executeScript("return document.readyState")));
     }
 
     public void fechar() {
