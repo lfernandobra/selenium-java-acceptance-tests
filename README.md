@@ -64,9 +64,9 @@ Automated acceptance test suite for the **Leilão** Spring Boot MVC application 
 ## 4. Local Setup & Execution
 
 ### Prerequisites
-* **Java 11+** (recommended Java 11 for Spring Boot `2.3.1.RELEASE`)
+* **Java 11+** (Selenium `4.27.0` with Spring Boot `2.3.1.RELEASE`)
 * **Apache Maven 3.6+**
-* **Google Chrome** + matching `chromedriver` on `PATH` (or passed via `-Dwebdriver.chrome.driver=/path/to/chromedriver`)
+* **Google Chrome** + matching `chromedriver` on `PATH` (or passed via `-Dwebdriver.chrome.binary` / `-Dwebdriver.chrome.driver`)
 
 ### 1. Start the Spring Boot Application (port `8080`)
 
@@ -91,10 +91,10 @@ mvn test -Dheadless=true
 ## 5. CI/CD Pipeline (GitHub Actions)
 
 Workflow [`ci.yml`](.github/workflows/ci.yml) executes on every `push` and `pull_request` to `main`:
-1. Configures Java 11 (Temurin) with Maven caching and installs matched Chrome + ChromeDriver via `browser-actions/setup-chrome@v2`.
+1. Configures Java 11 (Temurin) with Maven caching and installs Chrome `131` + matched ChromeDriver via `browser-actions/setup-chrome@v2`.
 2. Compiles main and test sources (`mvn -B test-compile`).
-3. Boots the Spring Boot application on port `8080` and polls `GET /login` readiness.
-4. Runs `mvn -B test -Dheadless=true` and archives `target/surefire-reports/` for 14 days.
+3. Boots the Spring Boot application on port `8080` with `spring-devtools` live-restart disabled (`SPRING_DEVTOOLS_RESTART_ENABLED=false`) and polls `GET /login` readiness.
+4. Runs `mvn -B test -Dheadless=true` passing `-Dwebdriver.chrome.binary` and `-Dwebdriver.chrome.driver`, archiving `target/surefire-reports/` for 14 days.
 
 ---
 
