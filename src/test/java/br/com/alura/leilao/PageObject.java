@@ -14,14 +14,20 @@ public class PageObject {
     public PageObject(WebDriver browser) {
         if (browser == null) {
             ChromeOptions options = new ChromeOptions();
-            if (Boolean.parseBoolean(System.getProperty("headless", "false"))
-                    || "true".equalsIgnoreCase(System.getenv("CI"))) {
+            boolean isCi = "true".equalsIgnoreCase(System.getenv("CI"));
+            String headlessProp = System.getProperty("headless");
+            boolean isHeadless = headlessProp != null
+                    ? Boolean.parseBoolean(headlessProp)
+                    : isCi && System.getenv("DISPLAY") == null;
+
+            if (isHeadless) {
+                options.addArguments("--headless=new", "--disable-extensions");
+            }
+            if (isHeadless || isCi) {
                 options.addArguments(
-                        "--headless=new",
                         "--no-sandbox",
                         "--disable-dev-shm-usage",
                         "--disable-gpu",
-                        "--disable-extensions",
                         "--remote-allow-origins=*",
                         "--window-size=1920,1080"
                 );
