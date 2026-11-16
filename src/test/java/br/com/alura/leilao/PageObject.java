@@ -6,7 +6,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 public class PageObject {
     protected WebDriver browser;
@@ -37,16 +37,22 @@ public class PageObject {
             this.browser = browser;
         }
         this.browser.manage().timeouts()
-                .implicitlyWait(5, TimeUnit.SECONDS)
-                .pageLoadTimeout(10, TimeUnit.SECONDS);
+                .implicitlyWait(Duration.ofSeconds(5))
+                .pageLoadTimeout(Duration.ofSeconds(10));
+    }
+
+    /**
+     * Cria uma instancia padrao de espera explicita para interacoes de UI.
+     */
+    protected WebDriverWait esperaPadrao() {
+        return new WebDriverWait(this.browser, Duration.ofSeconds(5));
     }
 
     /**
      * Aguarda a navegacao sair da URL informada apos um submit/redirecionamento.
      */
     protected void aguardarSaidaDaUrl(String urlAnterior) {
-        new WebDriverWait(this.browser, 5)
-                .until(ExpectedConditions.not(ExpectedConditions.urlToBe(urlAnterior)));
+        esperaPadrao().until(ExpectedConditions.not(ExpectedConditions.urlToBe(urlAnterior)));
     }
 
     public void fechar() {

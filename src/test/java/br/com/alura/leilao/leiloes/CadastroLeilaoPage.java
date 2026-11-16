@@ -6,7 +6,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class CadastroLeilaoPage extends PageObject {
     public static final String URL_CADASTRO_LEILAO = "http://localhost:8080/leiloes/new";
@@ -16,10 +15,16 @@ public class CadastroLeilaoPage extends PageObject {
     }
 
     public LeiloesPage cadastrarLeilao(String nome, String valorInicial, String dataAbertura) {
-        WebDriverWait wait = new WebDriverWait(this.browser, 5);
-        WebElement inputNome = wait.until(ExpectedConditions.elementToBeClickable(By.id("nome")));
+        WebElement inputNome = esperaPadrao().until(ExpectedConditions.elementToBeClickable(By.id("nome")));
         WebElement inputValor = this.browser.findElement(By.id("valorInicial"));
         WebElement inputData = this.browser.findElement(By.id("dataAbertura"));
+        JavascriptExecutor js = (JavascriptExecutor) this.browser;
+
+        js.executeScript(
+                "window.__dbg = {key:0, input:0, click:0};"
+                        + "document.getElementById('nome').addEventListener('keydown', function(){window.__dbg.key++;});"
+                        + "document.getElementById('nome').addEventListener('input', function(){window.__dbg.input++;});"
+                        + "document.getElementById('button-submit').addEventListener('click', function(){window.__dbg.click++;});");
 
         inputNome.clear();
         inputNome.sendKeys(nome);
@@ -28,15 +33,14 @@ public class CadastroLeilaoPage extends PageObject {
         inputData.clear();
         inputData.sendKeys(dataAbertura);
 
-        Object domInfo = ((JavascriptExecutor) this.browser).executeScript(
-                "return {url: window.location.href, readyState: document.readyState, hasFocus: document.hasFocus(), "
-                        + "nome: document.getElementById('nome') ? document.getElementById('nome').value : null, "
-                        + "valor: document.getElementById('valorInicial') ? document.getElementById('valorInicial').value : null, "
-                        + "data: document.getElementById('dataAbertura') ? document.getElementById('dataAbertura').value : null, "
-                        + "btnRect: document.getElementById('button-submit') ? JSON.stringify(document.getElementById('button-submit').getBoundingClientRect()) : null};");
+        Object domInfo = js.executeScript(
+                "return {url: window.location.href, dbg: window.__dbg, "
+                        + "nome: document.getElementById('nome').value, "
+                        + "valor: document.getElementById('valorInicial').value, "
+                        + "data: document.getElementById('dataAbertura').value};");
         System.err.println("CadastroLeilaoPage DOM pre-submit: " + domInfo);
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("button-submit"))).click();
+        esperaPadrao().until(ExpectedConditions.elementToBeClickable(By.id("button-submit"))).click();
         aguardarSaidaDaUrl(URL_CADASTRO_LEILAO);
 
         return new LeiloesPage(browser);
