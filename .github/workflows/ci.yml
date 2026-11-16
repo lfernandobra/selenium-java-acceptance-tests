@@ -54,6 +54,7 @@ jobs:
         run: |
           mvn -B test \
             -Dheadless=true \
+            -Dwebdriver.chrome.binary="${{ steps.setup-chrome.outputs.chrome-path }}" \
             -Dwebdriver.chrome.driver="${{ steps.setup-chrome.outputs.chromedriver-path }}"
 
       - name: Dump application logs on failure

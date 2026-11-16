@@ -33,6 +33,10 @@ public class PageObject {
                         "--window-size=1920,1080"
                 );
             }
+            String chromeBinary = System.getProperty("webdriver.chrome.binary");
+            if (chromeBinary != null && !chromeBinary.trim().isEmpty()) {
+                options.setBinary(chromeBinary);
+            }
             this.browser = new ChromeDriver(options);
         } else {
             this.browser = browser;
