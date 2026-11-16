@@ -20,6 +20,9 @@ public class PageObject {
                         "--headless=new",
                         "--no-sandbox",
                         "--disable-dev-shm-usage",
+                        "--disable-gpu",
+                        "--disable-extensions",
+                        "--remote-allow-origins=*",
                         "--window-size=1920,1080"
                 );
             }

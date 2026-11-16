@@ -3,6 +3,7 @@ package br.com.alura.leilao.leiloes;
 import br.com.alura.leilao.PageObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class CadastroLeilaoPage extends PageObject {
     public static final String URL_CADASTRO_LEILAO = "http://localhost:8080/leiloes/new";
@@ -12,10 +13,23 @@ public class CadastroLeilaoPage extends PageObject {
     }
 
     public LeiloesPage cadastrarLeilao(String nome, String valorInicial, String dataAbertura) {
-        this.browser.findElement(By.id("nome")).sendKeys(nome);
-        this.browser.findElement(By.id("valorInicial")).sendKeys(valorInicial);
-        this.browser.findElement(By.id("dataAbertura")).sendKeys(dataAbertura);
-        this.browser.findElement(By.id("button-submit")).submit();
+        WebElement inputNome = this.browser.findElement(By.id("nome"));
+        WebElement inputValor = this.browser.findElement(By.id("valorInicial"));
+        WebElement inputData = this.browser.findElement(By.id("dataAbertura"));
+
+        inputNome.clear();
+        inputNome.sendKeys(nome);
+        inputValor.clear();
+        inputValor.sendKeys(valorInicial);
+        inputData.clear();
+        inputData.sendKeys(dataAbertura);
+
+        System.err.printf("CadastroLeilaoPage pre-submit values: nome='%s' valor='%s' data='%s'%n",
+                inputNome.getAttribute("value"),
+                inputValor.getAttribute("value"),
+                inputData.getAttribute("value"));
+
+        this.browser.findElement(By.id("button-submit")).click();
         aguardarSaidaDaUrl(URL_CADASTRO_LEILAO);
 
         return new LeiloesPage(browser);
