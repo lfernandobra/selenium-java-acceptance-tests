@@ -52,12 +52,23 @@ jobs:
       - name: Execute Selenium & JUnit acceptance suite (headless)
         run: |
           mvn -B test \
+            -Dtest=LeiloesTest \
+            -Dheadless=true \
+            -Dwebdriver.chrome.driver="${{ steps.setup-chrome.outputs.chromedriver-path }}" \
+            -Dwebdriver.chrome.logfile=/tmp/chromedriver-leiloes.log \
+            -Dwebdriver.chrome.verboseLogging=true && \
+          mvn -B test \
+            -Dtest=LoginTest \
             -Dheadless=true \
             -Dwebdriver.chrome.driver="${{ steps.setup-chrome.outputs.chromedriver-path }}"
 
       - name: Dump application logs on failure
         if: failure()
-        run: cat /tmp/leilao.log || true
+        run: |
+          echo "=== /tmp/leilao.log ==="
+          cat /tmp/leilao.log || true
+          echo "=== /tmp/chromedriver-leiloes.log (COMMAND/RESPONSE/DevTools tail 200) ==="
+          grep -E "COMMAND|RESPONSE|ERROR|exception" /tmp/chromedriver-leiloes.log | tail -n 200 || true
 
       - name: Upload Maven Surefire test reports
         if: always()
