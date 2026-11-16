@@ -35,7 +35,8 @@ jobs:
 
       - name: Start Spring Boot Leilão application (port 8080)
         run: |
-          mvn -B spring-boot:run > /tmp/leilao.log 2>&1 &
+          SPRING_DEVTOOLS_RESTART_ENABLED=false mvn -B spring-boot:run \
+            -Dspring-boot.run.jvmArguments="-Dspring.devtools.restart.enabled=false" > /tmp/leilao.log 2>&1 &
           for i in $(seq 1 45); do
             if curl -sf http://localhost:8080/login >/dev/null; then
               echo "Leilao application is ready."
